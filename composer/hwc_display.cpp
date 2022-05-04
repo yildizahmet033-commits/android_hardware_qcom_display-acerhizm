@@ -1775,8 +1775,10 @@ HWC3::Error HWCDisplay::GetHdrCapabilities(uint32_t *out_num_types, int32_t *out
     return HWC3::Error::None;
   }
 
+#ifdef TARGET_SUPPORTS_DOLBY_VISION
   // We support DOLBY_VISION, HDR10, HLG and HDR10_PLUS.
   fixed_info.dolby_vision_supported = true;
+#endif /* TARGET_SUPPORTS_DOLBY_VISION */
 
   uint32_t num_types = 0;
   if (fixed_info.hdr_plus_supported) {
