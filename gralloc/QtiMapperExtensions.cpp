@@ -582,6 +582,13 @@ Return<void> QtiMapperExtensions::getFormatLayout(int32_t format, uint64_t usage
     std::vector<gralloc::PlaneLayoutInfo> plane_layout_info;
 
     if (!snap_helper_->GetFormatLayout(info, &plane_layout_info, &size, flags)) {
+      // SnapAlloc lists planes in memory order (YV12: Y, Cr, Cb), but this legacy API
+      // reports them as Y, Cb, Cr and Adreno maps the planes by index; keep that order.
+      if (plane_layout_info.size() == 3 &&
+          plane_layout_info[1].component == gralloc::PLANE_COMPONENT_Cr &&
+          plane_layout_info[2].component == gralloc::PLANE_COMPONENT_Cb) {
+        std::swap(plane_layout_info[1], plane_layout_info[2]);
+      }
       plane_info.resize(plane_layout_info.size());
 
       ALOGD_IF(enable_logs_, "%s: Number of plane - %zu gralloc format %d", __FUNCTION__,
